@@ -1,0 +1,124 @@
+// @vitest-environment jsdom
+import { readFileSync } from 'node:fs';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { searchWoolworths, shopAtWoolworths } from './shop.js';
+
+vi.mock('./shop.js', () => ({
+  searchWoolworths: vi.fn().mockResolvedValue(undefined),
+  shopAtWoolworths: vi.fn().mockResolvedValue(undefined),
+}));
+
+const button = (id: string) => document.querySelector<HTMLButtonElement>(`#${id}-button`)!;
+const selected = () => document.querySelector('#items [aria-current="true"]')?.textContent;
+function createList(text: string) {
+  document.querySelector<HTMLTextAreaElement>('#grocery-list')!.value = text;
+  document.querySelector('#list-form')!.dispatchEvent(new Event('submit', { cancelable: true }));
+}
+
+beforeEach(async () => {
+  vi.clearAllMocks();
+  vi.resetModules();
+  document.documentElement.innerHTML = readFileSync('index.html', 'utf8');
+  await import('./main.js');
+});
+
+describe('shopping controls', () => {
+  it('hides all three controls until a non-empty list is created', () => {
+    for (const id of ['start', 'previous', 'next']) expect(button(id).hidden).toBe(true);
+    createList(' \n\t');
+    for (const id of ['start', 'previous', 'next']) expect(button(id).hidden).toBe(true);
+    expect(selected()).toBeUndefined();
+    createList(' Milk \nBread');
+    for (const id of ['start', 'previous', 'next']) expect(button(id).hidden).toBe(false);
+    expect(selected()).toBe('Milk');
+    expect(button('previous').disabled).toBe(true);
+    expect(button('next').disabled).toBe(false);
+  });
+
+  it('highlights and searches in both directions, stopping at boundaries', async () => {
+    createList('Milk\nBread\nApples');
+    expect(searchWoolworths).not.toHaveBeenCalled();
+    button('previous').click();
+    expect(selected()).toBe('Milk');
+    expect(searchWoolworths).not.toHaveBeenCalled();
+    button('next').click();
+    expect(selected()).toBe('Bread');
+    expect(searchWoolworths).toHaveBeenLastCalledWith('Bread');
+    await vi.waitFor(() => expect(button('start').disabled).toBe(false));
+    expect(button('previous').disabled).toBe(false);
+    expect(button('next').disabled).toBe(false);
+    button('next').click();
+    expect(selected()).toBe('Apples');
+    expect(searchWoolworths).toHaveBeenLastCalledWith('Apples');
+    await vi.waitFor(() => expect(button('start').disabled).toBe(false));
+    expect(button('next').disabled).toBe(true);
+    button('next').click();
+    expect(selected()).toBe('Apples');
+    button('previous').click();
+    expect(selected()).toBe('Bread');
+    expect(searchWoolworths).toHaveBeenLastCalledWith('Bread');
+    await vi.waitFor(() => expect(button('start').disabled).toBe(false));
+    button('previous').click();
+    expect(selected()).toBe('Milk');
+    expect(searchWoolworths).toHaveBeenLastCalledWith('Milk');
+    await vi.waitFor(() => expect(button('start').disabled).toBe(false));
+    expect(button('previous').disabled).toBe(true);
+    expect(searchWoolworths).toHaveBeenCalledTimes(4);
+    expect(shopAtWoolworths).not.toHaveBeenCalled();
+  });
+
+  it('disables both navigation buttons for a single item', () => {
+    createList('Milk');
+    expect(selected()).toBe('Milk');
+    expect(button('previous').disabled).toBe(true);
+    expect(button('next').disabled).toBe(true);
+    expect(button('start').hidden).toBe(false);
+  });
+
+  it('resets selection for a replacement list and hides controls when cleared', async () => {
+    createList('Milk\nBread');
+    button('next').click();
+    await vi.waitFor(() => expect(button('start').disabled).toBe(false));
+    createList('Apples\nEggs');
+    expect(selected()).toBe('Apples');
+    expect(button('previous').disabled).toBe(true);
+    createList('');
+    expect(selected()).toBeUndefined();
+    for (const id of ['start', 'previous', 'next']) expect(button(id).hidden).toBe(true);
+  });
+
+  it('places Start shopping beside Create list and searches without submitting edits', async () => {
+    createList('Milk\nBread & butter');
+    expect(button('start').previousElementSibling?.textContent).toBe('Create list');
+    button('next').click();
+    await vi.waitFor(() => expect(button('start').disabled).toBe(false));
+    vi.mocked(searchWoolworths).mockClear();
+    document.querySelector<HTMLTextAreaElement>('#grocery-list')!.value = 'Unsaved edits';
+    button('start').click();
+    expect(searchWoolworths).toHaveBeenCalledExactlyOnceWith('Bread & butter');
+    await vi.waitFor(() => expect(button('start').disabled).toBe(false));
+  });
+
+  it('blocks overlapping shopping actions and allows retry after failure', async () => {
+    let rejectSearch!: (error: Error) => void;
+    vi.mocked(searchWoolworths).mockImplementationOnce(() => new Promise((_, reject) => {
+      rejectSearch = reject;
+    }));
+    createList('Milk\nBread');
+    button('start').click();
+    expect(button('start').disabled).toBe(true);
+    expect(button('shop').disabled).toBe(true);
+    expect(button('next').disabled).toBe(true);
+    button('next').click();
+    expect(selected()).toBe('Milk');
+    button('start').click();
+    button('shop').click();
+    expect(searchWoolworths).toHaveBeenCalledTimes(1);
+    expect(shopAtWoolworths).not.toHaveBeenCalled();
+    rejectSearch(new Error('Chrome unavailable'));
+    await vi.waitFor(() => expect(button('start').disabled).toBe(false));
+    expect(button('shop').disabled).toBe(false);
+    expect(button('next').disabled).toBe(false);
+    expect(document.querySelector('#shop-status')!.textContent).toContain('Please try again');
+  });
+});

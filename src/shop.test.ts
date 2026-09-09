@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { shopAtWoolworths } from './shop.js';
+import { searchWoolworths, shopAtWoolworths } from './shop.js';
 
 const browser = {
   tabs: {
@@ -71,5 +71,32 @@ describe('shopAtWoolworths', () => {
     await expect(shopAtWoolworths()).rejects.toThrow('Tab closed');
     expect(browser.tabs.create).not.toHaveBeenCalled();
     expect(browser.windows.update).not.toHaveBeenCalled();
+  });
+});
+
+describe('searchWoolworths', () => {
+  it('creates a new active tab directly at the encoded search URL', async () => {
+    await searchWoolworths('milk & bread + 50% #1 / kūmara?');
+    expect(browser.tabs.create).toHaveBeenCalledExactlyOnceWith({
+      url: 'https://www.woolworths.co.nz/shop/search/products?search=milk%20%26%20bread%20%2B%2050%25%20%231%20%2F%20k%C5%ABmara%3F',
+      active: true,
+    });
+    expect(browser.tabs.update).not.toHaveBeenCalled();
+  });
+
+  it('navigates an existing tab and focuses its window for each search', async () => {
+    browser.tabs.query.mockResolvedValue([{ id: 42, windowId: 8 }]);
+    await searchWoolworths('Milk');
+    await searchWoolworths('Bread');
+    expect(browser.tabs.query).toHaveBeenCalledWith({ url: 'https://www.woolworths.co.nz/*' });
+    expect(browser.tabs.update).toHaveBeenNthCalledWith(1, 42, {
+      active: true, url: 'https://www.woolworths.co.nz/shop/search/products?search=Milk',
+    });
+    expect(browser.tabs.update).toHaveBeenNthCalledWith(2, 42, {
+      active: true, url: 'https://www.woolworths.co.nz/shop/search/products?search=Bread',
+    });
+    expect(browser.windows.update).toHaveBeenCalledWith(8, { focused: true });
+    expect(browser.windows.update).toHaveBeenCalledTimes(2);
+    expect(browser.tabs.create).not.toHaveBeenCalled();
   });
 });

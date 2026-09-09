@@ -15,7 +15,12 @@ through searching for each item on Woolworths NZ in one reusable browser tab.
 - Provide a Shop at Woolworths button and a reminder to log in first.
 - Open the Woolworths NZ homepage in a new tab, or focus an existing matching
   tab and its window without navigating that tab.
-- Do not search list items or interact with login, products, or the trolley.
+- Select the first item after list creation. Provide Previous and Next navigation
+  with disabled boundaries; hide navigation and Start shopping for empty lists.
+- Place Start shopping beside Create list. Search the selected item on Start
+  shopping and after Previous or Next changes the selection, using an encoded Woolworths
+  search URL in a reused tab (or a new tab if none exists), then focus that tab.
+- Do not interact with login, product selection, or the trolley.
 - Do not add features or permissions beyond this scope without a user request.
 
 ## Technology and workflow

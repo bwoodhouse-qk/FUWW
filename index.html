@@ -19,12 +19,17 @@
         <p id="list-help">Paste one item per line.</p>
         <textarea id="grocery-list" rows="8" aria-describedby="list-help"
           placeholder="Milk&#10;Bread&#10;Apples"></textarea>
-        <button type="submit">Create list</button>
+        <div class="list-actions">
+          <button type="submit">Create list</button>
+          <button id="start-button" type="button" hidden>Start shopping</button>
+        </div>
       </form>
       <section aria-labelledby="items-heading">
         <h2 id="items-heading">Your items</h2>
         <p id="list-status" role="status">No items yet.</p>
         <ol id="items"></ol>
+        <button id="previous-button" type="button" hidden disabled>Previous</button>
+        <button id="next-button" type="button" hidden disabled>Next</button>
       </section>
     </main>
   </body>
