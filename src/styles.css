@@ -32,6 +32,9 @@ button {
   cursor: pointer;
 }
 button:hover { background: #193e26; }
+#shop-button { width: 100%; font-weight: 700; }
+#shop-reminder { margin-top: 8px; }
+button:disabled { opacity: 0.65; cursor: wait; }
 :focus-visible { outline: 3px solid #b75b13; outline-offset: 3px; }
 section { margin-top: 24px; }
 ol { padding-left: 24px; }

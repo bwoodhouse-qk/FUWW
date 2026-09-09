@@ -12,13 +12,17 @@ through searching for each item on Woolworths NZ in one reusable browser tab.
 - Treat each non-empty line as one item, trimming surrounding whitespace.
 - Display items below the form, preserving order, duplicates, and inner text.
 - Keep the list in memory only.
-- Do not integrate with Woolworths, navigate tabs, or automate cart actions yet.
+- Provide a Shop at Woolworths button and a reminder to log in first.
+- Open the Woolworths NZ homepage in a new tab, or focus an existing matching
+  tab and its window without navigating that tab.
+- Do not search list items or interact with login, products, or the trolley.
 - Do not add features or permissions beyond this scope without a user request.
 
 ## Technology and workflow
 
 - Use TypeScript with plain HTML and CSS, without React or another UI framework.
-- Use Chrome Manifest V3 and the sidePanel permission.
+- Use Chrome Manifest V3, the sidePanel permission, and host access limited to
+  `https://www.woolworths.co.nz/*` for finding existing tabs.
 - Use Vitest for unit tests; keep parsing separate from DOM rendering.
 - Work in small, understandable, tested increments.
 - Run `npm test` and `npm run build` after changes; fix failures before finishing.

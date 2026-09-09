@@ -5,5 +5,6 @@
   "description": "Turn a pasted grocery list into individual shopping-list items.",
   "minimum_chrome_version": "114",
   "permissions": ["sidePanel"],
+  "host_permissions": ["https://www.woolworths.co.nz/*"],
   "side_panel": { "default_path": "index.html" }
 }
