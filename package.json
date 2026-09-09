@@ -1,0 +1,19 @@
+{
+  "name": "fuww",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "A small grocery-list Chrome side-panel extension.",
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "build": "tsc && node scripts/build.mjs"
+  },
+  "devDependencies": {
+    "typescript": "^7.0.2",
+    "vitest": "^5.0.0"
+  }
+}
