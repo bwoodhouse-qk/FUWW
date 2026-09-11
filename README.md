@@ -2,7 +2,7 @@
 
 FUWW means “Fuck You, Woolworths.” The eventual goal is a Chrome Manifest V3
 side-panel extension that turns a human-written grocery list into guided searches
-on Woolworths NZ, using one reusable browser tab.
+on Woolworths NZ or Pak n Save, using one reusable browser tab per store.
 
 This version parses and displays a list. Paste one item per line and
 click **Create list**. Empty lines are ignored and surrounding whitespace is
@@ -30,6 +30,19 @@ Creating a list does not search. Editing the textarea
 does not change the saved list until you click Create list again.
 
 There is no interaction with login, product selection, or the trolley.
+
+## Pak n Save
+
+Click **Shop at Pak n Save** to open `https://www.paknsave.co.nz/`, or focus
+an existing tab on that host without changing its page. This also selects Pak n
+Save for **Start shopping**, **Previous**, and **Next**. Its searches use
+`https://www.paknsave.co.nz/shop/search?q=...` with encoded item text.
+
+The panel shows the selected store and updates the login reminder. Click
+**Shop at Woolworths** to switch back. Switching stores preserves your list and
+highlighted item. Each store reuses its own tab, including across Chrome windows.
+The selected store stays in memory for the panel session and defaults to
+Woolworths when the panel page reloads. The list controls behave the same for both stores.
 
 ## Getting started
 
@@ -78,19 +91,29 @@ files into `dist/`. It does not require a development server.
     do not verify the site's results or redirects.
 14. Create a single-item list (both navigation buttons disabled), replace it
     with another list (first item selected), then submit blank input (controls hidden).
+15. Click Shop at Pak n Save with no list: its homepage should open and the
+    selected-store label and login reminder should change. Click again and
+    confirm no duplicate tab is created.
+16. Create a list and repeat Start shopping, Previous, and Next with Pak n Save.
+    Confirm the highlighted item matches the live search, including `bread & butter`
+    and `kūmara`. Test with its tab in another window and with no Pak n Save tab open.
+17. With both stores open, switch back and forth using their Shop buttons.
+    Confirm the list and highlighted item stay the same and searches navigate
+    only the selected store's tab. Check tab focus and live results manually;
+    automated tests use mocked Chrome APIs.
 
 After editing the code, rebuild, click the extension's reload button on
 `chrome://extensions`, and close and reopen its panel.
 
 ## Permissions
 
-`sidePanel` enables the panel. The host permission
-`https://www.woolworths.co.nz/*` lets FUWW find existing tabs on that specific
-HTTPS host. Creating and activating tabs and focusing windows need no additional
+`sidePanel` enables the panel. The host permissions
+`https://www.woolworths.co.nz/*` and `https://www.paknsave.co.nz/*` let FUWW find
+existing tabs on those specific HTTPS hosts. Creating and activating tabs and focusing windows need no additional
 permission. FUWW does not request the broad `tabs` permission or inject scripts.
 See the [Chrome tabs API documentation](https://developer.chrome.com/docs/extensions/reference/api/tabs).
-This search feature adds no permissions; the existing Woolworths host permission
-also covers navigation to its search page.
+This update adds only the Pak n Save host permission. After rebuilding and
+reloading the extension, allow that site permission if Chrome asks.
 
 ## Project structure
 
@@ -102,7 +125,7 @@ also covers navigation to its search page.
 - `src/main.test.ts`: tests the real panel HTML using jsdom, a test-only DOM environment.
 - `src/parse-list.ts`: converts text into an array of shopping-list items.
 - `src/parse-list.test.ts`: Vitest tests for the parser's input rules.
-- `src/shop.ts`: opens Woolworths, searches via encoded URLs, and reuses its tab.
+- `src/shop.ts`: opens either store, searches via encoded URLs, and shares tab-reuse logic.
 - `src/shop.test.ts`: tests tab creation, reuse, and failures with mocked Chrome APIs.
 - `tsconfig.json`: TypeScript settings for checking and compiling the app.
 - `scripts/build.mjs`: copies the HTML, CSS, and manifest after compilation.

@@ -1,11 +1,14 @@
 import { parseList } from './parse-list.js';
-import { searchWoolworths, shopAtWoolworths } from './shop.js';
+import { searchWoolworths, shopAtWoolworths, searchPakNSave, shopAtPakNSave } from './shop.js';
 
 const form = document.querySelector<HTMLFormElement>('#list-form')!;
 const textarea = document.querySelector<HTMLTextAreaElement>('#grocery-list')!;
 const list = document.querySelector<HTMLOListElement>('#items')!;
 const status = document.querySelector<HTMLParagraphElement>('#list-status')!;
 const shopButton = document.querySelector<HTMLButtonElement>('#shop-button')!;
+const pakButton = document.querySelector<HTMLButtonElement>('#pak-button')!;
+const storeStatus = document.querySelector<HTMLParagraphElement>('#store-status')!;
+const reminder = document.querySelector<HTMLParagraphElement>('#shop-reminder')!;
 const shopStatus = document.querySelector<HTMLParagraphElement>('#shop-status')!;
 const startButton = document.querySelector<HTMLButtonElement>('#start-button')!;
 const previousButton = document.querySelector<HTMLButtonElement>('#previous-button')!;
@@ -13,6 +16,11 @@ const nextButton = document.querySelector<HTMLButtonElement>('#next-button')!;
 let items: string[] = [];
 let currentIndex = 0;
 let shoppingBusy = false;
+const stores = {
+  woolworths: { name: 'Woolworths', open: shopAtWoolworths, search: searchWoolworths },
+  paknsave: { name: 'Pak n Save', open: shopAtPakNSave, search: searchPakNSave },
+};
+let selectedStore: keyof typeof stores = 'woolworths';
 
 async function runShoppingAction(action: () => Promise<void>): Promise<void> {
   // Prevent repeated clicks from creating tabs while Chrome is still responding.
@@ -23,17 +31,25 @@ async function runShoppingAction(action: () => Promise<void>): Promise<void> {
   try {
     await action();
   } catch {
-    shopStatus.textContent = 'Could not open Woolworths. Please try again.';
+    shopStatus.textContent = `Could not open ${stores[selectedStore].name}. Please try again.`;
   } finally {
     shoppingBusy = false;
     updateSelection();
   }
 }
 
-shopButton.addEventListener('click', () => void runShoppingAction(shopAtWoolworths));
+function chooseStore(store: keyof typeof stores): void {
+  if (shoppingBusy) return;
+  selectedStore = store;
+  storeStatus.textContent = `Shopping at: ${stores[store].name}`;
+  reminder.textContent = `Log in to ${stores[store].name} before you start shopping.`;
+  void runShoppingAction(stores[store].open);
+}
+shopButton.addEventListener('click', () => chooseStore('woolworths'));
+pakButton.addEventListener('click', () => chooseStore('paknsave'));
 function searchCurrentItem(): void {
   const item = items[currentIndex];
-  if (item !== undefined) void runShoppingAction(() => searchWoolworths(item));
+  if (item !== undefined) void runShoppingAction(() => stores[selectedStore].search(item));
 }
 startButton.addEventListener('click', searchCurrentItem);
 
@@ -43,7 +59,7 @@ function updateSelection(): void {
     else element.removeAttribute('aria-current');
   }
   startButton.hidden = previousButton.hidden = nextButton.hidden = items.length === 0;
-  shopButton.disabled = startButton.disabled = shoppingBusy;
+  shopButton.disabled = pakButton.disabled = startButton.disabled = shoppingBusy;
   previousButton.disabled = shoppingBusy || currentIndex === 0;
   nextButton.disabled = shoppingBusy || currentIndex >= items.length - 1;
   status.textContent = items.length === 0

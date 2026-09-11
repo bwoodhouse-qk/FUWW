@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { searchWoolworths, shopAtWoolworths } from './shop.js';
+import { searchWoolworths, shopAtWoolworths, searchPakNSave, shopAtPakNSave } from './shop.js';
 
 const browser = {
   tabs: {
@@ -17,6 +17,43 @@ beforeEach(() => {
 });
 
 afterEach(() => vi.unstubAllGlobals());
+
+describe('Pak n Save shopping', () => {
+  it('opens the homepage when no matching tab exists', async () => {
+    await shopAtPakNSave();
+    expect(browser.tabs.query).toHaveBeenCalledExactlyOnceWith({ url: 'https://www.paknsave.co.nz/*' });
+    expect(browser.tabs.create).toHaveBeenCalledExactlyOnceWith({ url: 'https://www.paknsave.co.nz/', active: true });
+  });
+
+  it('reuses an existing tab without navigating it and focuses its window', async () => {
+    browser.tabs.query.mockResolvedValue([{ id: 17, windowId: 2 }]);
+    await shopAtPakNSave();
+    expect(browser.tabs.update).toHaveBeenCalledExactlyOnceWith(17, { active: true });
+    expect(browser.windows.update).toHaveBeenCalledExactlyOnceWith(2, { focused: true });
+    expect(browser.tabs.create).not.toHaveBeenCalled();
+  });
+
+  it('opens an encoded search directly when no tab exists', async () => {
+    await searchPakNSave('milk & bread + 50% #1 / kūmara?');
+    expect(browser.tabs.create).toHaveBeenCalledExactlyOnceWith({
+      url: 'https://www.paknsave.co.nz/shop/search?q=milk%20%26%20bread%20%2B%2050%25%20%231%20%2F%20k%C5%ABmara%3F', active: true,
+    });
+  });
+
+  it('keeps each store in its own tab when switching searches', async () => {
+    browser.tabs.query.mockImplementation(({ url }) => Promise.resolve([
+      { id: url === 'https://www.paknsave.co.nz/*' ? 17 : 42, windowId: 2 },
+    ]));
+    await searchPakNSave('Milk');
+    await searchWoolworths('Bread');
+    await searchPakNSave('Apples');
+    expect(browser.tabs.update).toHaveBeenNthCalledWith(1, 17, { active: true, url: 'https://www.paknsave.co.nz/shop/search?q=Milk' });
+    expect(browser.tabs.update).toHaveBeenNthCalledWith(2, 42, { active: true, url: 'https://www.woolworths.co.nz/shop/search/products?search=Bread' });
+    expect(browser.tabs.update).toHaveBeenNthCalledWith(3, 17, { active: true, url: 'https://www.paknsave.co.nz/shop/search?q=Apples' });
+    expect(browser.windows.update).toHaveBeenCalledTimes(3);
+    expect(browser.tabs.create).not.toHaveBeenCalled();
+  });
+});
 
 describe('shopAtWoolworths', () => {
   it('opens the homepage in a new active tab when no match exists', async () => {

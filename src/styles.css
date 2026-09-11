@@ -32,7 +32,7 @@ button {
   cursor: pointer;
 }
 button:hover { background: #193e26; }
-#shop-button { width: 100%; font-weight: 700; }
+#shop-button, #pak-button { width: 100%; font-weight: 700; }
 #shop-reminder { margin-top: 8px; }
 button:disabled { opacity: 0.65; cursor: not-allowed; }
 .list-actions { display: flex; gap: 8px; flex-wrap: wrap; }

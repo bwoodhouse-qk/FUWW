@@ -13,21 +13,29 @@ interface ShoppingChrome {
 declare const chrome: ShoppingChrome;
 
 export function shopAtWoolworths(): Promise<void> {
-  return openWoolworths();
+  return openStore('https://www.woolworths.co.nz/');
 }
 
 export function searchWoolworths(item: string): Promise<void> {
-  return openWoolworths(`https://www.woolworths.co.nz/shop/search/products?search=${encodeURIComponent(item)}`);
+  return openStore('https://www.woolworths.co.nz/', `https://www.woolworths.co.nz/shop/search/products?search=${encodeURIComponent(item)}`);
 }
 
-async function openWoolworths(searchUrl?: string): Promise<void> {
-  const tabs = await chrome.tabs.query({ url: 'https://www.woolworths.co.nz/*' });
+export function shopAtPakNSave(): Promise<void> {
+  return openStore('https://www.paknsave.co.nz/');
+}
+
+export function searchPakNSave(item: string): Promise<void> {
+  return openStore('https://www.paknsave.co.nz/', `https://www.paknsave.co.nz/shop/search?q=${encodeURIComponent(item)}`);
+}
+
+async function openStore(homeUrl: string, searchUrl?: string): Promise<void> {
+  const tabs = await chrome.tabs.query({ url: `${homeUrl}*` });
   const tab = tabs.find((candidate) => candidate.id !== undefined);
 
   if (tab?.id !== undefined) {
     await chrome.tabs.update(tab.id, { active: true, ...(searchUrl ? { url: searchUrl } : {}) });
     await chrome.windows.update(tab.windowId, { focused: true });
   } else {
-    await chrome.tabs.create({ url: searchUrl ?? 'https://www.woolworths.co.nz/', active: true });
+    await chrome.tabs.create({ url: searchUrl ?? homeUrl, active: true });
   }
 }

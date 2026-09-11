@@ -1,11 +1,13 @@
 // @vitest-environment jsdom
 import { readFileSync } from 'node:fs';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { searchWoolworths, shopAtWoolworths } from './shop.js';
+import { searchWoolworths, shopAtWoolworths, searchPakNSave, shopAtPakNSave } from './shop.js';
 
 vi.mock('./shop.js', () => ({
   searchWoolworths: vi.fn().mockResolvedValue(undefined),
   shopAtWoolworths: vi.fn().mockResolvedValue(undefined),
+  searchPakNSave: vi.fn().mockResolvedValue(undefined),
+  shopAtPakNSave: vi.fn().mockResolvedValue(undefined),
 }));
 
 const button = (id: string) => document.querySelector<HTMLButtonElement>(`#${id}-button`)!;
@@ -23,6 +25,53 @@ beforeEach(async () => {
 });
 
 describe('shopping controls', () => {
+  it('opens Pak n Save and uses it for Start, Next, and Previous, then switches back', async () => {
+    createList('Milk\nBread');
+    button('pak').click();
+    expect(shopAtPakNSave).toHaveBeenCalledExactlyOnceWith();
+    expect(document.querySelector('#store-status')!.textContent).toBe('Shopping at: Pak n Save');
+    expect(document.querySelector('#shop-reminder')!.textContent).toBe('Log in to Pak n Save before you start shopping.');
+    await vi.waitFor(() => expect(button('start').disabled).toBe(false));
+    button('start').click();
+    expect(searchPakNSave).toHaveBeenLastCalledWith('Milk');
+    await vi.waitFor(() => expect(button('start').disabled).toBe(false));
+    button('next').click();
+    expect(selected()).toBe('Bread');
+    expect(searchPakNSave).toHaveBeenLastCalledWith('Bread');
+    await vi.waitFor(() => expect(button('start').disabled).toBe(false));
+    expect(button('next').disabled).toBe(true);
+    button('previous').click();
+    expect(selected()).toBe('Milk');
+    expect(searchPakNSave).toHaveBeenLastCalledWith('Milk');
+    await vi.waitFor(() => expect(button('start').disabled).toBe(false));
+    expect(button('previous').disabled).toBe(true);
+    expect(searchWoolworths).not.toHaveBeenCalled();
+    button('shop').click();
+    expect(shopAtWoolworths).toHaveBeenCalledExactlyOnceWith();
+    await vi.waitFor(() => expect(button('start').disabled).toBe(false));
+    expect(selected()).toBe('Milk');
+    expect(document.querySelector('#store-status')!.textContent).toBe('Shopping at: Woolworths');
+    button('start').click();
+    expect(searchWoolworths).toHaveBeenCalledExactlyOnceWith('Milk');
+    await vi.waitFor(() => expect(button('start').disabled).toBe(false));
+  });
+
+  it('opens Pak n Save without a list and reports store-specific errors with retry', async () => {
+    vi.mocked(shopAtPakNSave).mockRejectedValueOnce(new Error('Unavailable'));
+    button('pak').click();
+    expect(button('shop').disabled).toBe(true);
+    expect(button('pak').disabled).toBe(true);
+    button('shop').click();
+    await vi.waitFor(() => expect(button('pak').disabled).toBe(false));
+    expect(shopAtWoolworths).not.toHaveBeenCalled();
+    expect(document.querySelector('#shop-status')!.textContent).toBe('Could not open Pak n Save. Please try again.');
+    for (const id of ['start', 'previous', 'next']) expect(button(id).hidden).toBe(true);
+    button('pak').click();
+    await vi.waitFor(() => expect(button('pak').disabled).toBe(false));
+    expect(shopAtPakNSave).toHaveBeenCalledTimes(2);
+    expect(document.querySelector('#shop-status')!.textContent).toBe('');
+  });
+
   it('hides all three controls until a non-empty list is created', () => {
     for (const id of ['start', 'previous', 'next']) expect(button(id).hidden).toBe(true);
     createList(' \n\t');
