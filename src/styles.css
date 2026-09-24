@@ -32,12 +32,23 @@ button {
   cursor: pointer;
 }
 button:hover { background: #193e26; }
+button:disabled { opacity: 0.65; cursor: not-allowed; }
 #shop-button, #pak-button { width: 100%; font-weight: 700; }
 #shop-reminder { margin-top: 8px; }
-button:disabled { opacity: 0.65; cursor: not-allowed; }
 .list-actions { display: flex; gap: 8px; flex-wrap: wrap; }
-li[aria-current="true"] { background: #dcebdc; font-weight: 700; border-left: 4px solid #245635; padding-left: 8px; }
+li.is-current,
+li[aria-current="true"] {
+  background: #dcebdc;
+  font-weight: 700;
+  border-left: 4px solid #245635;
+  padding-left: 8px;
+  border-radius: 4px;
+}
 :focus-visible { outline: 3px solid #b75b13; outline-offset: 3px; }
 section { margin-top: 24px; }
 ol { padding-left: 24px; }
 li { padding: 4px 0; overflow-wrap: anywhere; white-space: pre-wrap; }
+textarea:disabled,
+button[type="submit"]:disabled {
+  opacity: 0.6;
+}

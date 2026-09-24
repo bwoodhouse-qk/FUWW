@@ -47,6 +47,13 @@ function chooseStore(store: keyof typeof stores): void {
 }
 shopButton.addEventListener('click', () => chooseStore('woolworths'));
 pakButton.addEventListener('click', () => chooseStore('paknsave'));
+
+function lockListControls(): void {
+  textarea.disabled = shoppingBusy;
+  const submitButton = form.querySelector<HTMLButtonElement>('button[type="submit"]');
+  if (submitButton) submitButton.disabled = shoppingBusy;
+}
+
 function searchCurrentItem(): void {
   const item = items[currentIndex];
   if (item !== undefined) void runShoppingAction(() => stores[selectedStore].search(item));
@@ -55,13 +62,19 @@ startButton.addEventListener('click', searchCurrentItem);
 
 function updateSelection(): void {
   for (const [index, element] of Array.from(list.children).entries()) {
-    if (index === currentIndex) element.setAttribute('aria-current', 'true');
-    else element.removeAttribute('aria-current');
+    if (index === currentIndex) {
+      element.setAttribute('aria-current', 'true');
+      element.classList.add('is-current');
+    } else {
+      element.removeAttribute('aria-current');
+      element.classList.remove('is-current');
+    }
   }
   startButton.hidden = previousButton.hidden = nextButton.hidden = items.length === 0;
   shopButton.disabled = pakButton.disabled = startButton.disabled = shoppingBusy;
   previousButton.disabled = shoppingBusy || currentIndex === 0;
   nextButton.disabled = shoppingBusy || currentIndex >= items.length - 1;
+  lockListControls();
   status.textContent = items.length === 0
     ? 'No items yet.'
     : `Item ${currentIndex + 1} of ${items.length}.`;

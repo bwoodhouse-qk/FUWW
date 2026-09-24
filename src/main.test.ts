@@ -170,4 +170,25 @@ describe('shopping controls', () => {
     expect(button('next').disabled).toBe(false);
     expect(document.querySelector('#shop-status')!.textContent).toContain('Please try again');
   });
+
+  it('marks the active item with a dedicated class and locks the form while shopping is busy', async () => {
+    let resolveSearch!: () => void;
+    vi.mocked(searchWoolworths).mockImplementationOnce(() => new Promise<void>((resolve) => {
+      resolveSearch = resolve;
+    }));
+
+    createList('Milk\nBread');
+    const currentItem = document.querySelector('#items [aria-current="true"]');
+    expect(currentItem).not.toBeNull();
+    expect(currentItem?.classList.contains('is-current')).toBe(true);
+
+    button('start').click();
+    expect(document.querySelector<HTMLButtonElement>('#list-form button[type="submit"]')!.disabled).toBe(true);
+    expect(document.querySelector<HTMLTextAreaElement>('#grocery-list')!.disabled).toBe(true);
+
+    resolveSearch();
+    await vi.waitFor(() => expect(button('start').disabled).toBe(false));
+    expect(document.querySelector<HTMLButtonElement>('#list-form button[type="submit"]')!.disabled).toBe(false);
+    expect(document.querySelector<HTMLTextAreaElement>('#grocery-list')!.disabled).toBe(false);
+  });
 });
