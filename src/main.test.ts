@@ -25,6 +25,45 @@ beforeEach(async () => {
 });
 
 describe('shopping controls', () => {
+  it.each(['woolworths', 'paknsave'])('clicks an item to highlight and search it at %s', async (store) => {
+    if (store === 'paknsave') {
+      button('pak').click();
+      await vi.waitFor(() => expect(button('pak').disabled).toBe(false));
+    }
+    createList('Milk\nBread\nApples');
+    const itemButtons = document.querySelectorAll<HTMLButtonElement>('#items button');
+    expect(itemButtons[2].type).toBe('button');
+    itemButtons[2].click();
+    expect(selected()).toBe('Apples');
+    expect(document.querySelectorAll('#items .is-current')).toHaveLength(1);
+    const search = store === 'paknsave' ? searchPakNSave : searchWoolworths;
+    expect(search).toHaveBeenCalledExactlyOnceWith('Apples');
+    expect(itemButtons[0].disabled).toBe(true);
+    itemButtons[0].click();
+    expect(selected()).toBe('Apples');
+    expect(search).toHaveBeenCalledTimes(1);
+    await vi.waitFor(() => expect(itemButtons[0].disabled).toBe(false));
+    expect(button('next').disabled).toBe(true);
+    expect(button('previous').disabled).toBe(false);
+    itemButtons[0].click();
+    expect(selected()).toBe('Milk');
+    expect(search).toHaveBeenLastCalledWith('Milk');
+    await vi.waitFor(() => expect(itemButtons[0].disabled).toBe(false));
+    expect(button('previous').disabled).toBe(true);
+    expect(button('next').disabled).toBe(false);
+  });
+
+  it('uses item position for duplicate text and allows searching the current item again', async () => {
+    createList('Milk\nMilk');
+    const lastItem = document.querySelectorAll<HTMLLIElement>('#items li')[1];
+    lastItem.click();
+    expect(lastItem.getAttribute('aria-current')).toBe('true');
+    await vi.waitFor(() => expect(button('start').disabled).toBe(false));
+    lastItem.querySelector('button')!.click();
+    expect(searchWoolworths).toHaveBeenCalledTimes(2);
+    await vi.waitFor(() => expect(button('start').disabled).toBe(false));
+  });
+
   it('enables setup scrolling only for a created non-empty list', () => {
     const style = document.createElement('style');
     style.textContent = readFileSync('src/styles.css', 'utf8');

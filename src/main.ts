@@ -63,6 +63,7 @@ startButton.addEventListener('click', searchCurrentItem);
 function updateSelection(): void {
   document.querySelector('main')!.classList.toggle('has-items', items.length > 0);
   for (const [index, element] of Array.from(list.children).entries()) {
+    element.querySelector('button')!.disabled = shoppingBusy;
     if (index === currentIndex) {
       element.setAttribute('aria-current', 'true');
       element.classList.add('is-current');
@@ -94,25 +95,28 @@ function revealCurrentItem(): void {
   }
 }
 
-function moveSelection(direction: number): void {
-  const nextIndex = currentIndex + direction;
+function selectItem(nextIndex: number): void {
   if (shoppingBusy || nextIndex < 0 || nextIndex >= items.length) return;
   currentIndex = nextIndex;
   updateSelection();
   revealCurrentItem();
   searchCurrentItem();
 }
-previousButton.addEventListener('click', () => moveSelection(-1));
-nextButton.addEventListener('click', () => moveSelection(1));
+previousButton.addEventListener('click', () => selectItem(currentIndex - 1));
+nextButton.addEventListener('click', () => selectItem(currentIndex + 1));
 
 form.addEventListener('submit', (event) => {
   event.preventDefault();
   items = parseList(textarea.value);
   currentIndex = 0;
 
-  list.replaceChildren(...items.map((item) => {
+  list.replaceChildren(...items.map((item, index) => {
     const element = document.createElement('li');
-    element.textContent = item;
+    const itemButton = document.createElement('button');
+    itemButton.type = 'button';
+    itemButton.textContent = item;
+    element.append(itemButton);
+    element.addEventListener('click', () => selectItem(index));
     return element;
   }));
   list.scrollTop = 0;

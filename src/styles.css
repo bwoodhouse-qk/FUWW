@@ -70,6 +70,21 @@ section h2 { margin: 0; }
 .item-navigation { display: flex; gap: 8px; }
 ol { padding-left: 24px; }
 li { padding: 4px 0; overflow-wrap: anywhere; white-space: pre-wrap; }
+#items li { cursor: pointer; }
+#items button {
+  display: block;
+  width: 100%;
+  margin: 0;
+  padding: 4px 8px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  white-space: inherit;
+  overflow-wrap: anywhere;
+}
+#items button:hover:not(:disabled) { background: #e7eee3; }
+#items button:focus-visible { outline-offset: -3px; }
 textarea:disabled,
 button[type="submit"]:disabled {
   opacity: 0.6;

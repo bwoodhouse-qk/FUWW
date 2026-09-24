@@ -30,6 +30,8 @@ existing Woolworths tab to `/shop/search/products?search=...`, encoding the item
 text safely in the URL, and focuses the tab and its window. If no matching tab
 exists, it opens the search in a new active tab. **Start shopping** sits beside
 **Create list**. Previous and Next highlight and immediately search the new item.
+You can also click any item to highlight and search it in the selected store.
+Each item is a keyboard-accessible button: use Tab to focus it, then Enter or Space.
 Shopping buttons briefly disable while Chrome responds to prevent overlapping actions.
 Creating a list does not search. Editing the textarea
 does not change the saved list until you click Create list again.
