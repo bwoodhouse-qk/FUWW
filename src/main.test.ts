@@ -16,6 +16,11 @@ function createList(text: string) {
   document.querySelector<HTMLTextAreaElement>('#grocery-list')!.value = text;
   document.querySelector('#list-form')!.dispatchEvent(new Event('submit', { cancelable: true }));
 }
+function editList(text: string) {
+  const textarea = document.querySelector<HTMLTextAreaElement>('#grocery-list')!;
+  textarea.value = text;
+  textarea.dispatchEvent(new Event('input', { bubbles: true }));
+}
 
 beforeEach(async () => {
   vi.clearAllMocks();
@@ -25,6 +30,81 @@ beforeEach(async () => {
 });
 
 describe('shopping controls', () => {
+  it('shows Update list only for pending edits after initial creation', () => {
+    expect(button('update').hidden).toBe(true);
+    editList('Milk');
+    expect(button('update').hidden).toBe(true);
+    createList('Milk\nBread');
+    expect(button('update').hidden).toBe(true);
+    editList('Milk\nBread\nEggs');
+    expect(button('update').hidden).toBe(false);
+    expect(document.querySelectorAll('#items li')).toHaveLength(2);
+    editList('Milk\nBread');
+    expect(button('update').hidden).toBe(true);
+    editList('Milk\nBread\nEggs');
+    button('update').click();
+    expect(document.querySelectorAll('#items li')).toHaveLength(3);
+    expect(button('update').hidden).toBe(true);
+    expect(searchWoolworths).not.toHaveBeenCalled();
+  });
+
+  it('applies additions, removals, and renames while keeping progress and the selected store', async () => {
+    createList('Milk\nBread\nEggs');
+    button('pak').click();
+    await vi.waitFor(() => expect(button('start').disabled).toBe(false));
+    button('next').click();
+    await vi.waitFor(() => expect(button('start').disabled).toBe(false));
+    vi.mocked(searchPakNSave).mockClear();
+    editList('Apples\n Milk \n Bread\nEggs\n');
+    button('update').click();
+    expect(selected()).toBe('Bread');
+    expect(document.querySelector('#list-status')!.textContent).toBe('Item 3 of 4.');
+    editList('Milk\nWholemeal bread\nEggs');
+    button('update').click();
+    expect(selected()).toBe('Wholemeal bread');
+    editList('Milk\nEggs');
+    button('update').click();
+    expect(selected()).toBe('Eggs');
+    expect(button('next').disabled).toBe(true);
+    expect(searchPakNSave).not.toHaveBeenCalled();
+    button('start').click();
+    expect(searchPakNSave).toHaveBeenCalledExactlyOnceWith('Eggs');
+    await vi.waitFor(() => expect(button('start').disabled).toBe(false));
+    editList('Milk');
+    button('update').click();
+    expect(selected()).toBe('Milk');
+    expect(button('previous').disabled).toBe(true);
+    expect(button('next').disabled).toBe(true);
+    editList(' \n ');
+    button('update').click();
+    expect(selected()).toBeUndefined();
+    expect(button('start').hidden).toBe(true);
+    expect(button('next').hidden).toBe(true);
+    expect(button('previous').hidden).toBe(true);
+    editList('Carrots');
+    expect(button('update').hidden).toBe(false);
+    button('update').click();
+    expect(selected()).toBe('Carrots');
+    expect(button('start').hidden).toBe(false);
+  });
+
+  it('keeps pending edits unapplied while a search is running', async () => {
+    let finish!: () => void;
+    vi.mocked(searchWoolworths).mockImplementationOnce(() => new Promise<void>((resolve) => { finish = resolve; }));
+    createList('Milk\nBread');
+    editList('Milk\nBread\nEggs');
+    button('start').click();
+    expect(button('update').disabled).toBe(true);
+    button('update').click();
+    expect(document.querySelectorAll('#items li')).toHaveLength(2);
+    expect(searchWoolworths).toHaveBeenCalledExactlyOnceWith('Milk');
+    finish();
+    await vi.waitFor(() => expect(button('update').disabled).toBe(false));
+    button('update').click();
+    expect(document.querySelectorAll('#items li')).toHaveLength(3);
+    expect(selected()).toBe('Milk');
+  });
+
   it.each(['woolworths', 'paknsave'])('clicks an item to highlight and search it at %s', async (store) => {
     if (store === 'paknsave') {
       button('pak').click();

@@ -13,6 +13,10 @@ for each store.
 - Treat each non-empty line as one item, trimming surrounding whitespace.
 - Display items below the form, preserving order, duplicates, and inner text.
 - Keep the list in memory only.
+- Show Update list when the textarea has unsaved changes after initial creation.
+  Apply additions, deletions, and edits without searching. Preserve the selected
+  item (including a renamed line); if removed, select the next remaining item,
+  or the last remaining item when there is no next item. An empty list has no selection.
 - Provide Shop at Woolworths and Shop at Pak n Save buttons and a reminder to log in first.
 - The last store button clicked selects the store for all subsequent searches;
   default to Woolworths and show the selected store. Keep the current list and item.

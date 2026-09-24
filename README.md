@@ -34,7 +34,17 @@ You can also click any item to highlight and search it in the selected store.
 Each item is a keyboard-accessible button: use Tab to focus it, then Enter or Space.
 Shopping buttons briefly disable while Chrome responds to prevent overlapping actions.
 Creating a list does not search. Editing the textarea
-does not change the saved list until you click Create list again.
+does not change the saved list until you click **Update list**. This button
+appears when you change the textarea after creating a list, and hides again
+after applying or undoing those changes. Add lines, delete lines, or edit their text.
+
+Update list preserves the highlighted item, including when lines above it change.
+Editing the selected line keeps that edited line selected. Removing it selects
+the next remaining item, or the last remaining item if there is no next one.
+Removing every line clears selection and hides shopping controls. Updating never
+starts a search. **Create list** still starts a fresh list at the first item.
+Since plain text has no item IDs, identical duplicates are matched in occurrence
+order and line edits are inferred from neighbouring text.
 
 There is no interaction with login, product selection, or the trolley.
 
@@ -118,6 +128,12 @@ stay in place. Repeat in a short Chrome window and with a long, wrapped item;
 items taller than the list viewport are shown from their top. The automated
 scroll tests use simulated geometry because jsdom does not perform layout.
 
+To check editing, select a middle item, add and delete lines above it, and click
+Update list. Confirm the same item stays highlighted and no search starts. Rename
+it, then remove it, checking the edited item and then the next item are selected.
+Clear all lines, apply the update, and add a new list. Verify scrolling and shopping
+still work with the updated items in Chrome.
+
 ## Permissions
 
 `sidePanel` enables the panel. The host permissions
@@ -138,6 +154,8 @@ reloading the extension, allow that site permission if Chrome asks.
 - `src/main.test.ts`: tests the real panel HTML using jsdom, a test-only DOM environment.
 - `src/parse-list.ts`: converts text into an array of shopping-list items.
 - `src/parse-list.test.ts`: Vitest tests for the parser's input rules.
+- `src/update-selection.ts`: matches the selected item to an edited list.
+- `src/update-selection.test.ts`: tests selection across additions, edits, and deletions.
 - `src/shop.ts`: opens either store, searches via encoded URLs, and shares tab-reuse logic.
 - `src/shop.test.ts`: tests tab creation, reuse, and failures with mocked Chrome APIs.
 - `tsconfig.json`: TypeScript settings for checking and compiling the app.

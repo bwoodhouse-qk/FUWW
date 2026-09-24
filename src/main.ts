@@ -1,4 +1,5 @@
 import { parseList } from './parse-list.js';
+import { updatedSelection } from './update-selection.js';
 import { searchWoolworths, shopAtWoolworths, searchPakNSave, shopAtPakNSave } from './shop.js';
 
 const form = document.querySelector<HTMLFormElement>('#list-form')!;
@@ -13,7 +14,10 @@ const shopStatus = document.querySelector<HTMLParagraphElement>('#shop-status')!
 const startButton = document.querySelector<HTMLButtonElement>('#start-button')!;
 const previousButton = document.querySelector<HTMLButtonElement>('#previous-button')!;
 const nextButton = document.querySelector<HTMLButtonElement>('#next-button')!;
+const updateButton = document.querySelector<HTMLButtonElement>('#update-button')!;
 let items: string[] = [];
+let hasCreatedList = false;
+let savedText = '';
 let currentIndex = 0;
 let shoppingBusy = false;
 const stores = {
@@ -49,6 +53,7 @@ shopButton.addEventListener('click', () => chooseStore('woolworths'));
 pakButton.addEventListener('click', () => chooseStore('paknsave'));
 
 function lockListControls(): void {
+  updateButton.disabled = shoppingBusy;
   textarea.disabled = shoppingBusy;
   const submitButton = form.querySelector<HTMLButtonElement>('button[type="submit"]');
   if (submitButton) submitButton.disabled = shoppingBusy;
@@ -105,10 +110,19 @@ function selectItem(nextIndex: number): void {
 previousButton.addEventListener('click', () => selectItem(currentIndex - 1));
 nextButton.addEventListener('click', () => selectItem(currentIndex + 1));
 
-form.addEventListener('submit', (event) => {
-  event.preventDefault();
-  items = parseList(textarea.value);
-  currentIndex = 0;
+function updateEditControls(): void {
+  updateButton.hidden = !hasCreatedList || textarea.value === savedText;
+}
+textarea.addEventListener('input', updateEditControls);
+
+function applyList(preserveSelection: boolean): void {
+  if (shoppingBusy) return;
+  const nextItems = parseList(textarea.value);
+  currentIndex = preserveSelection ? updatedSelection(items, nextItems, currentIndex) : 0;
+  items = nextItems;
+  hasCreatedList ||= items.length > 0;
+  savedText = textarea.value;
+  updateEditControls();
 
   list.replaceChildren(...items.map((item, index) => {
     const element = document.createElement('li');
@@ -122,4 +136,11 @@ form.addEventListener('submit', (event) => {
   list.scrollTop = 0;
 
   updateSelection();
+  if (preserveSelection) revealCurrentItem();
+}
+
+form.addEventListener('submit', (event) => {
+  event.preventDefault();
+  applyList(false);
 });
+updateButton.addEventListener('click', () => applyList(true));
