@@ -61,6 +61,7 @@ function searchCurrentItem(): void {
 startButton.addEventListener('click', searchCurrentItem);
 
 function updateSelection(): void {
+  document.querySelector('main')!.classList.toggle('has-items', items.length > 0);
   for (const [index, element] of Array.from(list.children).entries()) {
     if (index === currentIndex) {
       element.setAttribute('aria-current', 'true');
@@ -80,11 +81,25 @@ function updateSelection(): void {
     : `Item ${currentIndex + 1} of ${items.length}.`;
 }
 
+function revealCurrentItem(): void {
+  const item = list.children[currentIndex];
+  if (!item) return;
+  const viewport = list.getBoundingClientRect();
+  const bounds = item.getBoundingClientRect();
+  // Scroll only the list, leaving the setup area and navigation in place.
+  if (bounds.top < viewport.top || bounds.height > list.clientHeight) {
+    list.scrollTop += bounds.top - viewport.top;
+  } else if (bounds.bottom > viewport.bottom) {
+    list.scrollTop += bounds.bottom - viewport.bottom;
+  }
+}
+
 function moveSelection(direction: number): void {
   const nextIndex = currentIndex + direction;
   if (shoppingBusy || nextIndex < 0 || nextIndex >= items.length) return;
   currentIndex = nextIndex;
   updateSelection();
+  revealCurrentItem();
   searchCurrentItem();
 }
 previousButton.addEventListener('click', () => moveSelection(-1));
@@ -100,6 +115,7 @@ form.addEventListener('submit', (event) => {
     element.textContent = item;
     return element;
   }));
+  list.scrollTop = 0;
 
   updateSelection();
 });

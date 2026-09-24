@@ -25,6 +25,89 @@ beforeEach(async () => {
 });
 
 describe('shopping controls', () => {
+  it('enables setup scrolling only for a created non-empty list', () => {
+    const style = document.createElement('style');
+    style.textContent = readFileSync('src/styles.css', 'utf8');
+    document.head.append(style);
+    const setup = document.querySelector<HTMLElement>('#setup')!;
+    expect(getComputedStyle(setup).overflowY).toBe('visible');
+    createList(' \n ');
+    expect(getComputedStyle(setup).overflowY).toBe('visible');
+    createList('Milk');
+    expect(getComputedStyle(setup).overflowY).toBe('auto');
+    createList('');
+    expect(getComputedStyle(setup).overflowY).toBe('visible');
+    expect(document.querySelector('main')!.classList.contains('has-items')).toBe(false);
+  });
+
+  it('keeps navigation outside the independently scrollable list', () => {
+    const style = document.createElement('style');
+    style.textContent = readFileSync('src/styles.css', 'utf8');
+    document.head.append(style);
+    createList(Array.from({ length: 100 }, (_, i) => `Item ${i + 1}`).join('\n'));
+    const list = document.querySelector<HTMLOListElement>('#items')!;
+    expect(getComputedStyle(list).overflowY).toBe('auto');
+    expect(getComputedStyle(list).minHeight).toBe('0px');
+    expect(getComputedStyle(button('next').parentElement!).flexShrink).toBe('0');
+    expect(list.contains(button('next'))).toBe(false);
+    expect(button('next').hidden).toBe(false);
+    expect(button('previous').hidden).toBe(false);
+    expect(list.tabIndex).toBe(0);
+  });
+
+  it('scrolls the list down and up to reveal selected items without moving setup', async () => {
+    createList('Milk\nBread\nApples');
+    const list = document.querySelector<HTMLOListElement>('#items')!;
+    const setup = document.querySelector<HTMLElement>('#setup')!;
+    // jsdom has no layout: supply viewport/item geometry for the scroll behaviour.
+    Object.defineProperty(list, 'clientHeight', { value: 100 });
+    list.getBoundingClientRect = () => ({ top: 100, bottom: 200, height: 100 } as DOMRect);
+    list.children[1].getBoundingClientRect = () => ({ top: 190, bottom: 230, height: 40 } as DOMRect);
+    list.children[0].getBoundingClientRect = () => ({ top: 70, bottom: 110, height: 40 } as DOMRect);
+    setup.scrollTop = 25;
+    button('next').click();
+    expect(selected()).toBe('Bread');
+    expect(list.scrollTop).toBe(30);
+    expect(setup.scrollTop).toBe(25);
+    expect(list.contains(button('next'))).toBe(false);
+    expect(list.contains(button('previous'))).toBe(false);
+    await vi.waitFor(() => expect(button('start').disabled).toBe(false));
+    button('previous').click();
+    expect(selected()).toBe('Milk');
+    expect(list.scrollTop).toBe(0);
+    expect(setup.scrollTop).toBe(25);
+    await vi.waitFor(() => expect(button('start').disabled).toBe(false));
+  });
+
+  it('does not scroll an already visible item and resets scrolling for a new list', async () => {
+    createList('Milk\nBread');
+    const list = document.querySelector<HTMLOListElement>('#items')!;
+    Object.defineProperty(list, 'clientHeight', { value: 100 });
+    list.getBoundingClientRect = () => ({ top: 100, bottom: 200, height: 100 } as DOMRect);
+    list.children[1].getBoundingClientRect = () => ({ top: 120, bottom: 160, height: 40 } as DOMRect);
+    list.scrollTop = 20;
+    button('next').click();
+    expect(list.scrollTop).toBe(20);
+    await vi.waitFor(() => expect(button('start').disabled).toBe(false));
+    createList('Eggs');
+    expect(list.scrollTop).toBe(0);
+    expect(selected()).toBe('Eggs');
+    list.scrollTop = 20;
+    createList('');
+    expect(list.scrollTop).toBe(0);
+  });
+
+  it('aligns the top of an item taller than the list viewport', async () => {
+    createList('Milk\nA very long item');
+    const list = document.querySelector<HTMLOListElement>('#items')!;
+    Object.defineProperty(list, 'clientHeight', { value: 100 });
+    list.getBoundingClientRect = () => ({ top: 100, bottom: 200, height: 100 } as DOMRect);
+    list.children[1].getBoundingClientRect = () => ({ top: 180, bottom: 380, height: 200 } as DOMRect);
+    button('next').click();
+    expect(list.scrollTop).toBe(80);
+    await vi.waitFor(() => expect(button('start').disabled).toBe(false));
+  });
+
   it('opens Pak n Save and uses it for Start, Next, and Previous, then switches back', async () => {
     createList('Milk\nBread');
     button('pak').click();

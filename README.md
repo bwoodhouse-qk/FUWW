@@ -19,6 +19,11 @@ After creating a non-empty list, the first item is highlighted. **Previous** and
 **Next** change the current item, stopping at the ends of the list. These buttons
 and **Start shopping** are hidden until a non-empty list is created. Creating a
 replacement list selects its first item; submitting blank input hides the controls.
+The item list scrolls independently, with Previous and Next kept below it in view.
+Navigation scrolls the selected item into view. Once a non-empty list is created,
+the setup area above can scroll independently so it does not push navigation
+off-screen. Before list creation, or after clearing the list, the setup area
+uses the normal page layout without its own scrollbar.
 
 Click **Start shopping** to search for the highlighted item. FUWW navigates the
 existing Woolworths tab to `/shop/search/products?search=...`, encoding the item
@@ -104,6 +109,12 @@ files into `dist/`. It does not require a development server.
 
 After editing the code, rebuild, click the extension's reload button on
 `chrome://extensions`, and close and reopen its panel.
+
+To check scrolling manually, create a long list and step forward and backward
+through it. Confirm the current item stays visible and the navigation buttons
+stay in place. Repeat in a short Chrome window and with a long, wrapped item;
+items taller than the list viewport are shown from their top. The automated
+scroll tests use simulated geometry because jsdom does not perform layout.
 
 ## Permissions
 

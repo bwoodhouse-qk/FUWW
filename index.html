@@ -9,6 +9,7 @@
   </head>
   <body>
     <main>
+      <div id="setup">
       <h1>FUWW</h1>
       <p>Your grocery list, one item at a time.</p>
       <button id="shop-button" type="button" aria-describedby="shop-reminder">Shop at Woolworths</button>
@@ -26,12 +27,15 @@
           <button id="start-button" type="button" hidden>Start shopping</button>
         </div>
       </form>
+      </div>
       <section aria-labelledby="items-heading">
         <h2 id="items-heading">Your items</h2>
         <p id="list-status" role="status">No items yet.</p>
-        <ol id="items"></ol>
+        <ol id="items" tabindex="0" aria-labelledby="items-heading"></ol>
+        <div class="item-navigation">
         <button id="previous-button" type="button" hidden disabled>Previous</button>
         <button id="next-button" type="button" hidden disabled>Next</button>
+        </div>
       </section>
     </main>
   </body>
