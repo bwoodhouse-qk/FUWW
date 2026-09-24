@@ -45,6 +45,9 @@ button {
 button:hover { background: #193e26; }
 button:disabled { opacity: 0.65; cursor: not-allowed; }
 #shop-button, #pak-button { width: 100%; font-weight: 700; }
+#pak-button { background: #ffed00; color: #000; }
+#pak-button:hover { background: #e6d500; }
+#store-status { font-weight: 700; }
 #shop-reminder { margin-top: 8px; }
 .list-actions { display: flex; gap: 8px; flex-wrap: wrap; }
 li.is-current,
