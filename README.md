@@ -6,6 +6,18 @@ Queerly Kiwi Pink Trolley is a Chrome Manifest V3 side-panel extension that
 turns a human-written grocery list into guided searches on Woolworths NZ or Pak n Save,
 using one reusable browser tab per store.
 
+## Using Pink Trolley
+
+Read the [user guide](guide.html) for the first-shop walkthrough, editing lists,
+switching stores, and troubleshooting. It is also available through **Read the
+user guide** in the panel, which opens the guide in a separate tab. The panel
+includes collapsible first-shop instructions and a reminder to keep a copy of
+your list. The setup instructions below are for building and loading the extension.
+
+This is a personal project created purely out of frustration with grocery shopping. If you have suggestions or requests, feel free to email me at [bex.woodhouse@gmail.com](mailto:bex.woodhouse@gmail.com).
+
+Like QKPT? [Buy Bex a ko-fi](https://ko-fi.com/bexwoodhouse) and help spoil three very needy kittens.
+
 This version parses and displays a list. Paste one item per line and
 click **Create list**. Empty lines are ignored and surrounding whitespace is
 trimmed. Item order, duplicates, and the wording inside each line are preserved.
@@ -151,6 +163,7 @@ reloading the extension, allow that site permission if Chrome asks.
 - `manifest.json`: tells Chrome this is a Manifest V3 extension and identifies
   its side-panel page and the permissions explained above.
 - `index.html`: the panel's heading, labelled textarea, button, and results list.
+- `guide.html`: the user guide, bundled with the extension and accessible from the panel.
 - `src/styles.css`: simple styling for a narrow panel.
 - `src/main.ts`: handles list creation, current-item navigation, and shopping buttons.
 - `src/main.test.ts`: tests the real panel HTML using jsdom, a test-only DOM environment.

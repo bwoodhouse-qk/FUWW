@@ -12,6 +12,16 @@
       <div id="setup">
       <h1>Queerly Kiwi Pink Trolley</h1>
       <p>The delightfully opinionated little extension that helps you shop a pasted grocery list, one item at a time.</p>
+      <details class="first-use" open>
+        <summary>First shop? Start here</summary>
+        <ol>
+          <li>Choose your supermarket below and log in on its website.</li>
+          <li>Paste one item per line, then click <strong>Create list</strong>.</li>
+          <li>Click <strong>Start shopping</strong> to search for the highlighted item.</li>
+          <li>Add your chosen product on the store website, then click <strong>Next</strong> in this panel.</li>
+        </ol>
+      </details>
+      <p class="guide-link"><a href="guide.html" target="_blank" rel="noopener">Read the user guide</a></p>
       <div role="group" aria-label="Store selection">
         <button id="shop-button" type="button" aria-describedby="shop-reminder" aria-pressed="true" aria-label="Select Woolworths store">Shop at Woolworths</button>
         <button id="pak-button" type="button" aria-describedby="shop-reminder" aria-pressed="false" aria-label="Select Pak n Save store">Shop at Pak n Save</button>
@@ -21,8 +31,9 @@
       <p id="shop-status" role="status" aria-live="polite"></p>
       <form id="list-form">
         <label for="grocery-list">Grocery list</label>
-        <p id="list-help">Paste one item per line.</p>
-        <textarea id="grocery-list" rows="8" aria-describedby="list-help"
+        <p id="list-help">Paste one item per line. To apply edits later, click Update list.</p>
+        <p id="list-lifetime">Keep a copy of your list: it is lost when this panel page closes or reloads.</p>
+        <textarea id="grocery-list" rows="8" aria-describedby="list-help list-lifetime"
           placeholder="Milk&#10;Bread&#10;Apples"></textarea>
         <div class="list-actions">
           <button type="submit">Create list</button>

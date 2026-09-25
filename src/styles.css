@@ -27,6 +27,13 @@ h1 {
 h2 { font-size: 1.15rem; }
 label { display: block; font-weight: 600; }
 #list-help { margin: 4px 0 8px; }
+a { color: #6d1d45; text-underline-offset: 3px; }
+.first-use { padding: 12px; background: #fffafc; border-radius: 6px; }
+.first-use summary { cursor: pointer; font-weight: 700; }
+.first-use ol { margin-bottom: 0; }
+.guide-link, #list-lifetime { font-size: 0.9rem; }
+.user-guide { max-width: 720px; }
+.user-guide h2 { margin-top: 24px; }
 textarea {
   display: block;
   width: 100%;
