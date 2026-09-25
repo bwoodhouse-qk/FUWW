@@ -83,8 +83,8 @@ files into `dist/`. It does not require a development server.
 2. Open `chrome://extensions` in a current desktop version of Chrome.
 3. Turn on **Developer mode**.
 4. Click **Load unpacked** and select this project's **dist** folder.
-5. Open Chrome's Extensions menu (the puzzle-piece icon), find **Queerly Kiwi Pink Trolley**, and
-   choose **Open side panel** from its menu.
+5. Open Chrome's Extensions menu (the puzzle-piece icon) and pin **Queerly Kiwi Pink Trolley**.
+   Click its pink trolley toolbar icon to open the shopping side panel.
 6. Paste a few lines, including a blank line, and click **Create list**. Check
    that the items appear beneath the form. Submit an empty list to clear them.
 7. With no Woolworths NZ tabs open, click **Shop at Woolworths**. Confirm that
@@ -162,6 +162,9 @@ reloading the extension, allow that site permission if Chrome asks.
 - `src/shop.test.ts`: tests tab creation, reuse, and failures with mocked Chrome APIs.
 - `tsconfig.json`: TypeScript settings for checking and compiling the app.
 - `scripts/build.mjs`: copies the HTML, CSS, and manifest after compilation.
+- `src/background.ts`: enables opening the side panel by clicking the toolbar icon.
+- `icons/`: pink trolley PNG icons at Chrome's toolbar and extension sizes.
+- `scripts/generate-icons.ps1`: regenerates the icons using PowerShell and System.Drawing on Windows.
 - `package.json`: development dependencies and commands.
 - `package-lock.json`: records the installed dependency versions.
 - `AGENTS.md`: project scope and guidance for future coding work.
