@@ -1,8 +1,10 @@
-# FUWW
+# Queerly Kiwi Pink Trolley (QKPT)
 
-FUWW means “Fuck You, Woolworths.” The eventual goal is a Chrome Manifest V3
-side-panel extension that turns a human-written grocery list into guided searches
-on Woolworths NZ or Pak n Save, using one reusable browser tab per store.
+The delightfully opinionated little extension that helps you shop a pasted grocery list, one item at a time.
+
+Queerly Kiwi Pink Trolley is a Chrome Manifest V3 side-panel extension that
+turns a human-written grocery list into guided searches on Woolworths NZ or Pak n Save,
+using one reusable browser tab per store.
 
 This version parses and displays a list. Paste one item per line and
 click **Create list**. Empty lines are ignored and surrounding whitespace is
@@ -12,7 +14,7 @@ memory and is lost when the panel page is closed or reloaded.
 
 Click **Shop at Woolworths** to open the Woolworths NZ homepage in a new tab.
 If a tab on `https://www.woolworths.co.nz/` is already open (including any path),
-FUWW activates the first matching tab and focuses its window, keeping its current
+QKPT activates the first matching tab and focuses its window, keeping its current
 page. Log in to Woolworths before you start shopping.
 
 After creating a non-empty list, the first item is highlighted. **Previous** and
@@ -25,7 +27,7 @@ the setup area above can scroll independently so it does not push navigation
 off-screen. Before list creation, or after clearing the list, the setup area
 uses the normal page layout without its own scrollbar.
 
-Click **Start shopping** to search for the highlighted item. FUWW navigates the
+Click **Start shopping** to search for the highlighted item. QKPT navigates the
 existing Woolworths tab to `/shop/search/products?search=...`, encoding the item
 text safely in the URL, and focuses the tab and its window. If no matching tab
 exists, it opens the search in a new active tab. **Start shopping** sits beside
@@ -81,7 +83,7 @@ files into `dist/`. It does not require a development server.
 2. Open `chrome://extensions` in a current desktop version of Chrome.
 3. Turn on **Developer mode**.
 4. Click **Load unpacked** and select this project's **dist** folder.
-5. Open Chrome's Extensions menu (the puzzle-piece icon), find **FUWW**, and
+5. Open Chrome's Extensions menu (the puzzle-piece icon), find **Queerly Kiwi Pink Trolley**, and
    choose **Open side panel** from its menu.
 6. Paste a few lines, including a blank line, and click **Create list**. Check
    that the items appear beneath the form. Submit an empty list to clear them.
@@ -89,10 +91,10 @@ files into `dist/`. It does not require a development server.
    one new tab opens at `https://www.woolworths.co.nz/`.
 8. Click it again: the existing tab should activate without adding another tab.
 9. Move that tab into another Chrome window and navigate to another page on the
-   same site. Click the button in FUWW again: that window and tab should focus,
+   same site. Click the button in QKPT again: that window and tab should focus,
    keeping the page you selected. With multiple matching tabs, only one activates.
 10. Check that the login reminder appears beside the button and list creation
-    still works. FUWW does not log you in or select products.
+    still works. QKPT does not log you in or select products.
 11. Reopen the panel and confirm Start shopping, Previous, and Next are hidden.
     Create a three-item list: the first item should be highlighted and Previous
     disabled. Step forward and back; Next should be disabled at the last item.
@@ -137,9 +139,9 @@ still work with the updated items in Chrome.
 ## Permissions
 
 `sidePanel` enables the panel. The host permissions
-`https://www.woolworths.co.nz/*` and `https://www.paknsave.co.nz/*` let FUWW find
+`https://www.woolworths.co.nz/*` and `https://www.paknsave.co.nz/*` let QKPT find
 existing tabs on those specific HTTPS hosts. Creating and activating tabs and focusing windows need no additional
-permission. FUWW does not request the broad `tabs` permission or inject scripts.
+permission. QKPT does not request the broad `tabs` permission or inject scripts.
 See the [Chrome tabs API documentation](https://developer.chrome.com/docs/extensions/reference/api/tabs).
 This update adds only the Pak n Save host permission. After rebuilding and
 reloading the extension, allow that site permission if Chrome asks.
@@ -165,7 +167,7 @@ reloading the extension, allow that site permission if Chrome asks.
 - `AGENTS.md`: project scope and guidance for future coding work.
 - `.gitignore`: keeps generated files and local clutter out of Git.
 - `dist/`: generated extension files; load this folder into Chrome.
-- `FUWW.code-workspace`: the existing editor workspace file.
+- `QKPT.code-workspace`: the existing editor workspace file.
 
 The implementation uses TypeScript, plain HTML/CSS, and Vitest, without a UI
 framework or bundler. Chrome runs the compiled JavaScript as a local ES module.

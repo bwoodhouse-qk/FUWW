@@ -1,7 +1,7 @@
 :root {
   font-family: system-ui, sans-serif;
-  color: #202b24;
-  background: #f7f8f4;
+  color: #44253a;
+  background: #fbe7ef;
   line-height: 1.5;
 }
 
@@ -15,11 +15,15 @@ main {
   display: flex;
   flex-direction: column;
   gap: 16px;
+  background: #fbe7ef;
 }
 main.has-items { height: 100dvh; }
 #setup { flex: none; overflow-y: visible; }
 main.has-items #setup { flex: 1; min-height: 0; overflow-y: auto; }
-h1 { margin: 0; }
+h1 {
+  margin: 0;
+  color: #6d1d45;
+}
 h2 { font-size: 1.15rem; }
 label { display: block; font-weight: 600; }
 #list-help { margin: 4px 0 8px; }
@@ -28,8 +32,9 @@ textarea {
   width: 100%;
   padding: 12px;
   resize: vertical;
-  border: 1px solid #758277;
+  border: 1px solid #b7809a;
   border-radius: 6px;
+  background: #fffafc;
   font: inherit;
 }
 button {
@@ -37,28 +42,42 @@ button {
   padding: 10px 16px;
   border: 0;
   border-radius: 6px;
-  background: #245635;
-  color: white;
+  background: #eaa9c3;
+  color: #391420;
   font: inherit;
   cursor: pointer;
 }
-button:hover { background: #193e26; }
+button:hover { background: #df8db0; }
 button:disabled { opacity: 0.65; cursor: not-allowed; }
-#shop-button, #pak-button { width: 100%; font-weight: 700; }
+#shop-button, #pak-button { width: 100%; font-weight: 700; color: #fff; }
+#shop-button { background: #245635; }
+#shop-button:hover { background: #193e26; }
 #pak-button { background: #ffed00; color: #000; }
 #pak-button:hover { background: #e6d500; }
-#store-status { font-weight: 700; }
+#store-status { font-weight: 700; color: #6d1d45; }
 #shop-reminder { margin-top: 8px; }
 .list-actions { display: flex; gap: 8px; flex-wrap: wrap; }
 li.is-current,
 li[aria-current="true"] {
-  background: #dcebdc;
+  background: #f7dfe9;
   font-weight: 700;
-  border-left: 4px solid #245635;
+  border-left: 4px solid #6d1d45;
   padding-left: 8px;
   border-radius: 4px;
 }
-:focus-visible { outline: 3px solid #b75b13; outline-offset: 3px; }
+#items button[aria-current="true"] {
+  position: relative;
+  font-weight: 800;
+}
+#items button[aria-current="true"]::after {
+  content: "Current item";
+  display: inline-block;
+  margin-left: 0.5rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #6d1d45;
+}
+:focus-visible { outline: 3px solid #9e3f68; outline-offset: 3px; }
 section { flex: 1; min-height: 0; display: flex; flex-direction: column; }
 section h2, #list-status, .item-navigation { flex-shrink: 0; }
 section h2 { margin: 0; }
@@ -86,7 +105,7 @@ li { padding: 4px 0; overflow-wrap: anywhere; white-space: pre-wrap; }
   white-space: inherit;
   overflow-wrap: anywhere;
 }
-#items button:hover:not(:disabled) { background: #e7eee3; }
+#items button:hover:not(:disabled) { background: #f3d4e0; }
 #items button:focus-visible { outline-offset: -3px; }
 textarea:disabled,
 button[type="submit"]:disabled {

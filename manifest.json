@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "FUWW",
+  "name": "Queerly Kiwi Pink Trolley",
   "version": "0.1.0",
-  "description": "Turn a pasted grocery list into individual shopping-list items.",
+  "description": "The delightfully opinionated little extension that helps you shop a pasted grocery list, one item at a time.",
   "minimum_chrome_version": "114",
   "permissions": ["sidePanel"],
   "host_permissions": ["https://www.woolworths.co.nz/*", "https://www.paknsave.co.nz/*"],

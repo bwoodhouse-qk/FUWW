@@ -1,9 +1,9 @@
 {
-  "name": "fuww",
+  "name": "qkpt",
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "description": "A small grocery-list Chrome side-panel extension.",
+  "description": "The delightfully opinionated little extension that helps you shop a pasted grocery list, one item at a time.",
   "engines": {
     "node": ">=24"
   },

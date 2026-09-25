@@ -3,20 +3,22 @@
   <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>FUWW — Grocery list</title>
+    <title>Queerly Kiwi Pink Trolley — Grocery list</title>
     <link rel="stylesheet" href="src/styles.css">
     <script type="module" src="src/main.js"></script>
   </head>
   <body>
     <main>
       <div id="setup">
-      <h1>FUWW</h1>
-      <p>Your grocery list, one item at a time.</p>
-      <button id="shop-button" type="button" aria-describedby="shop-reminder">Shop at Woolworths</button>
-      <button id="pak-button" type="button" aria-describedby="shop-reminder">Shop at Pak n Save</button>
-      <p id="store-status" role="status">Shopping at: Woolworths</p>
+      <h1>Queerly Kiwi Pink Trolley</h1>
+      <p>The delightfully opinionated little extension that helps you shop a pasted grocery list, one item at a time.</p>
+      <div role="group" aria-label="Store selection">
+        <button id="shop-button" type="button" aria-describedby="shop-reminder" aria-pressed="true" aria-label="Select Woolworths store">Shop at Woolworths</button>
+        <button id="pak-button" type="button" aria-describedby="shop-reminder" aria-pressed="false" aria-label="Select Pak n Save store">Shop at Pak n Save</button>
+      </div>
+      <p id="store-status" role="status" aria-live="polite">Shopping at: Woolworths</p>
       <p id="shop-reminder">Log in to Woolworths before you start shopping.</p>
-      <p id="shop-status" role="status"></p>
+      <p id="shop-status" role="status" aria-live="polite"></p>
       <form id="list-form">
         <label for="grocery-list">Grocery list</label>
         <p id="list-help">Paste one item per line.</p>

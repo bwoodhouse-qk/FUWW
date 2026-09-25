@@ -45,6 +45,8 @@ async function runShoppingAction(action: () => Promise<void>): Promise<void> {
 function chooseStore(store: keyof typeof stores): void {
   if (shoppingBusy) return;
   selectedStore = store;
+  shopButton.setAttribute('aria-pressed', String(store === 'woolworths'));
+  pakButton.setAttribute('aria-pressed', String(store === 'paknsave'));
   storeStatus.textContent = `Shopping at: ${stores[store].name}`;
   reminder.textContent = `Log in to ${stores[store].name} before you start shopping.`;
   void runShoppingAction(stores[store].open);
@@ -68,19 +70,27 @@ startButton.addEventListener('click', searchCurrentItem);
 function updateSelection(): void {
   document.querySelector('main')!.classList.toggle('has-items', items.length > 0);
   for (const [index, element] of Array.from(list.children).entries()) {
-    element.querySelector('button')!.disabled = shoppingBusy;
+    const itemButton = element.querySelector<HTMLButtonElement>('button');
+    if (!itemButton) continue;
+    itemButton.disabled = shoppingBusy;
     if (index === currentIndex) {
       element.setAttribute('aria-current', 'true');
       element.classList.add('is-current');
+      itemButton.setAttribute('aria-current', 'true');
+      itemButton.setAttribute('aria-label', `${itemButton.textContent}, current item`);
     } else {
       element.removeAttribute('aria-current');
       element.classList.remove('is-current');
+      itemButton.removeAttribute('aria-current');
+      itemButton.setAttribute('aria-label', itemButton.textContent ?? '');
     }
   }
   startButton.hidden = previousButton.hidden = nextButton.hidden = items.length === 0;
   shopButton.disabled = pakButton.disabled = startButton.disabled = shoppingBusy;
   previousButton.disabled = shoppingBusy || currentIndex === 0;
   nextButton.disabled = shoppingBusy || currentIndex >= items.length - 1;
+  shopButton.setAttribute('aria-pressed', String(selectedStore === 'woolworths'));
+  pakButton.setAttribute('aria-pressed', String(selectedStore === 'paknsave'));
   lockListControls();
   status.textContent = items.length === 0
     ? 'No items yet.'

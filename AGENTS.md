@@ -1,8 +1,8 @@
-# FUWW project guidance
+# Queerly Kiwi Pink Trolley project guidance
 
 ## Product goal
 
-FUWW (“Fuck You, Woolworths”) will be a Chrome Manifest V3 side-panel extension.
+Queerly Kiwi Pink Trolley (QKPT) will be a Chrome Manifest V3 side-panel extension.
 A user pastes a human-written grocery list, then the extension guides them
 through searching for each item on Woolworths NZ or Pak n Save, reusing a tab
 for each store.
